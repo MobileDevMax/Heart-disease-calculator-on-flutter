@@ -1,0 +1,183 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(HeartDiseaseCalculatorApp());
+}
+
+class HeartDiseaseCalculatorApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Heart disease calculator',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+      ),
+      home: HeartDiseaseCalculatorHomePage(),
+    );
+  }
+}
+
+class HeartDiseaseCalculatorHomePage extends StatefulWidget {
+  @override
+  _HeartDiseaseCalculatorHomePageState createState() => _HeartDiseaseCalculatorHomePageState();
+}
+
+class _HeartDiseaseCalculatorHomePageState extends State<HeartDiseaseCalculatorHomePage> {
+  final _ageController = TextEditingController();
+  String _gender = 'Male';
+  String _hasDiabetes = 'No';
+  String _activityLevel = 'Low';
+  double _cholesterol = 0;
+  String _isSmoker = 'No';
+  String _result = '';
+
+  void _calculateRisk() {
+    final int? age = int.tryParse(_ageController.text);
+
+    if (age == null) {
+      setState(() {
+        _result = 'Please enter a valid age';
+      });
+      return;
+    }
+
+    // Simple risk calculation
+    double riskScore = 0;
+
+    // Conditions for risk assessment
+    if (age > 45) riskScore += 1;
+    if (_gender == 'Female') riskScore += 0.5;
+    if (_isSmoker == 'Yes') riskScore += 1;
+    if (_activityLevel == 'Low') riskScore += 1;
+    if (_cholesterol > 5.2) riskScore += 1;
+    if (_hasDiabetes == 'Yes') riskScore += 1;
+
+    if (riskScore >= 3) {
+      _result = 'High risk of cardiovascular disease';
+    } else if (riskScore == 2) {
+      _result = 'Moderate risk of cardiovascular disease';
+    } else {
+      _result = 'Low risk of cardiovascular disease';
+    }
+
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Heart disease calculator'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            TextField(
+              controller: _ageController,
+              decoration: InputDecoration(labelText: 'Age (years)'),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Sex:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            DropdownButton<String>(
+              value: _gender,
+              items: <String>['Male', 'Female'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _gender = newValue!;
+                });
+              },
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Do you have diabetes?',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            DropdownButton<String>(
+              value: _hasDiabetes,
+              items: <String>['Yes', 'No'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _hasDiabetes = newValue!;
+                });
+              },
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Physical activity level:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            DropdownButton<String>(
+              value: _activityLevel,
+              items: <String>['Low', 'Medium', 'High'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _activityLevel = newValue!;
+                });
+              },
+            ),
+            SizedBox(height: 10),
+            TextField(
+              decoration: InputDecoration(labelText: 'Cholesterol level (mmol/l)'),
+              keyboardType: TextInputType.number,
+              onChanged: (String value) {
+                setState(() {
+                  _cholesterol = double.tryParse(value) ?? 0;
+                });
+              },
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Do you smoke?',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            DropdownButton<String>(
+              value: _isSmoker,
+              items: <String>['Yes', 'No'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _isSmoker = newValue!;
+                });
+              },
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _calculateRisk,
+              child: Text('Assess the risk'),
+            ),
+            SizedBox(height: 20),
+            Text(
+              _result,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
